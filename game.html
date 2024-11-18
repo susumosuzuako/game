@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>SAMATOKIQUEST</title>
+  <style>
+    html{
+        touch-action: manipulation;
+    }
+    * {
+    margin: 0;
+    padding: 0;
+    
+}
+
+
+    body{
+        
+      height: 100vh;
+      margin: 0 auto;
+      background-color: #222;
+      background-image: url("back.png");
+      background-size: cover;
+   
+overflow-x:hidden;
+    }
+    .canvas {
+        display: flex;
+        justify-content: center;
+        right:0;
+    }
+    h1,h2,p{
+      color:#fff;
+      margin:-1px;
+    }
+    h1{
+        font-size: 20px;
+        text-align: center;
+        
+    }
+    h2{
+        font-size: 15px;
+        text-align: center;
+    }
+    p{
+        font-size:10px;
+        text-align: center;
+    }
+    canvas {
+      border: 1px solid #ffffff;
+    }
+    .button-container {
+       position: absolute; 
+       display:flex;
+       left:10%;
+       padding:3px;
+        transform: translateX(-50%); } 
+    .button { 
+        display: inline-block;
+  text-decoration: none;
+  color: rgba(152, 152, 152, 0.43);/*アイコン色*/
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
+  font-size: 30px;
+  border-radius: 50%;
+  text-align: center;
+  overflow: hidden;
+  font-weight: bold;
+  background-image: linear-gradient(#e8e8e8 0%, #d6d6d6 100%);
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.66);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.5), 0 2px 2px rgba(0, 0, 0, 0.19);
+  border-bottom: solid 2px #b5b5b5; }
+  .arrow-buttons { 
+    position: absolute;
+    top:32%;
+    right:90%;
+     transform: translateX(-50%); 
+     display: flex; gap: 10px; }
+      .arrow-button {
+         width: 50px;
+          height: 50px;
+           border: none;
+            border-radius: 50%; 
+            font-size: 24px; 
+            text-align: center; 
+            color: rgba(152, 152, 152, 0.43);/*アイコン色*/
+            background-image: linear-gradient(#e8e8e8 0%, #d6d6d6 100%);
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.66);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.5), 0 2px 2px rgba(0, 0, 0, 0.19);
+  border-bottom: solid 2px #b5b5b5;
+             }
+          
+    /* iPhone XR向けのスタイル */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+    /* ここにiPhone XR向けのスタイルを記述 */
+
+
+        * {
+    margin: 0;
+    padding: 0;
+  
+   
+}
+
+ body{
+   
+    width:100%;
+    height:100vh;
+    
+ }
+
+      #gameCanvas{
+     
+        margin:0 auto;
+    width:700px;
+height:320px;
+
+}
+.button-container{
+  
+  transform: translateX(-30%);
+  left: 120%;
+  margin:0;
+  
+  
+}
+
+
+     }
+     @media (orientation:landscape){
+
+  body{
+    width:100%;
+    height:100vh;
+    transform: rotate(0deg);
+    
+  }
+}
+@media (orientation:portrait){
+  body{
+    width:100%;
+    height:100vh;
+    transform: rotate(90deg);
+    
+  }
+
+}
+
+/* iPhone SE向けのスタイル */
+@media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2) {
+    /* ここにiPhone SE向けのスタイルを記述 */
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+   
+}
+
+      #gameCanvas{
+     
+        margin:0 auto;
+    width:600px;
+height:300px;
+
+}
+
+.button-container{
+  
+  transform: translateX(-30%);
+  left: 120%;
+  margin:0;
+  
+  
+}
+.arrow-buttons {
+    top:40%;
+    
+}
+   
+.button-container{
+    top:38%;
+}
+}
+
+
+  </style>
+</head>
+<body>
+  <h1>さまときクエスト</h1>
+  <h2>ろぬ「俺を倒してみぃ！」</h2>
+  <p>ボタンを押してろぬを倒してみろ</p>
+  <div class="canvas">
+  <canvas id="gameCanvas" width="780" height="320"></canvas>
+  <div class="button-container"> 
+    <button class="button" id="shootButton">撃</button> 
+    <button class="button" id="restartButton" style="display: none;">Re</button>
+    </div>
+    <div class="arrow-buttons">
+         <button class="arrow-button" id="leftButton">◀</button>
+         <button class="arrow-button" id="rightButton">▶</button> 
+        </div>
+</div>
+  <script>
+   
+
+   const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const keys = {};
+let touchX = null;
+let gameOverFlag = false;
+
+document.addEventListener('keydown', (e) => {
+    keys[e.code] = true;
+    if (e.code === 'Space') {
+        shootBullet();
+    }
+});
+document.addEventListener('keyup', (e) => {
+    keys[e.code] = false;
+});
+
+canvas.addEventListener('touchstart', (e) => {
+    touchX = e.touches[0].clientX;
+});
+canvas.addEventListener('touchmove', (e) => {
+    touchX = e.touches[0].clientX;
+});
+canvas.addEventListener('touchend', () => {
+    touchX = null;
+});
+
+document.getElementById('shootButton').addEventListener('click', shootBullet);
+document.getElementById('restartButton').addEventListener('click', restartGame);
+document.getElementById('leftButton').addEventListener('mousedown', () => keys['ArrowLeft'] = true); 
+document.getElementById('leftButton').addEventListener('mouseup', () => keys['ArrowLeft'] = false); 
+document.getElementById('rightButton').addEventListener('mousedown', () => keys['ArrowRight'] = true); 
+document.getElementById('rightButton').addEventListener('mouseup', () => keys['ArrowRight'] = false);
+document.getElementById('leftButton').addEventListener('touchstart', () => keys['ArrowLeft'] = true); document.getElementById('leftButton').addEventListener('touchend', () => keys['ArrowLeft'] = false); document.getElementById('rightButton').addEventListener('touchstart', () => keys['ArrowRight'] = true); document.getElementById('rightButton').addEventListener('touchend', () => keys['ArrowRight'] = false);
+let player = { x: canvas.width / 2, y: canvas.height - 60, size: 60, speed: 4, bullets: [], ready: false };
+let enemies = [];
+let enemySpawnCounter = 0;
+let moveDirection = 1;
+let moveDownCounter = 0;
+let score = 0;
+
+let playerImage = new Image();
+playerImage.src = "img/samatoki.png";
+playerImage.onload = function() {
+    player.image = playerImage;
+    player.ready = true;
+};
+
+let enemyImage = new Image();
+enemyImage.src = "img/ronu.png";
+enemyImage.onload = function() {
+    for (let i = 0; i < 5; i++) {
+        enemies.push({ x: Math.random() * (canvas.width - 40), y: Math.random() * (canvas.height / 2), size: 40, speed: 2, image: enemyImage, ready: true });
+    }
+};
+
+function drawEnemies() {
+    for (const enemy of enemies) {
+        if (enemy.ready) {
+            ctx.drawImage(enemy.image, enemy.x, enemy.y, enemy.size, enemy.size);
+        }
+    }
+}
+
+function drawBullets() {
+    ctx.fillStyle = 'green';
+    for (const bullet of player.bullets) {
+        ctx.fillRect(bullet.x, bullet.y, bullet.size, bullet.size);
+    }
+}
+
+function checkCollision(player, enemy) {
+    return player.x < enemy.x + enemy.size &&
+           player.x + player.size > enemy.x &&
+           player.y < enemy.y + enemy.size &&
+           player.y + player.size > enemy.y;
+}
+
+function gameOver() {
+    gameOverFlag = true;
+    alert("ゲームオーバー！まだまだやな");
+    document.getElementById('restartButton').style.display = 'block';
+}
+
+function restartGame() {
+    gameOverFlag = false;
+    document.getElementById('restartButton').style.display = 'none';
+    player.bullets = [];
+    enemies = [];
+    score = 0;
+    for (let i = 0; i < 5; i++) {
+        enemies.push({ x: Math.random() * (canvas.width - 40), y: Math.random() * (canvas.height / 2), size: 40, speed: 2, image: enemyImage, ready: true });
+    }
+    update();
+}
+
+function shootBullet() {
+    if (!gameOverFlag) {
+        player.bullets.push({ x: player.x + player.size / 2 - 2, y: player.y - 10, size: 4, speed: 6 });
+    }
+}
+
+function update() {
+    if (gameOverFlag) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (player.ready) {
+        ctx.drawImage(player.image, player.x, player.y, player.size, player.size);
+    }
+    drawEnemies();
+    drawBullets();
+    if (keys['ArrowLeft']) {
+        player.x -= player.speed;
+    }
+    if (keys['ArrowRight']) {
+        player.x += player.speed;
+    }
+    if (touchX !== null) {
+        player.x = touchX - player.size / 2;
+    }
+    for (const bullet of player.bullets) {
+        bullet.y -= bullet.speed;
+    }
+    player.bullets = player.bullets.filter(bullet => bullet.y > 0);
+
+    player.bullets.forEach((bullet) => {
+        enemies.forEach((enemy) => {
+            if (
+                bullet.x < enemy.x + enemy.size &&
+                bullet.x + bullet.size > enemy.x &&
+                bullet.y < enemy.y + enemy.size &&
+                bullet.y + bullet.size > enemy.y
+            ) {
+                bullet.toRemove = true;
+                enemy.toRemove = true;
+                score += 10;
+            }
+        });
+    });
+
+    player.bullets = player.bullets.filter((bullet) => !bullet.toRemove);
+    enemies = enemies.filter((enemy) => !enemy.toRemove);
+
+    enemySpawnCounter++;
+    if (enemySpawnCounter >= 60) {
+        enemies.push({ x: Math.random() * (canvas.width - 40), y: 0, size: 40, speed: 2, image: enemyImage, ready: true });
+        enemySpawnCounter = 0;
+    }
+
+    for (const enemy of enemies) {
+        enemy.y += enemy.speed;
+        if (enemy.ready && checkCollision(player, enemy)) {
+            gameOver();
+            return;
+        }
+    }
+
+    ctx.fillStyle = "white";
+    ctx.font = "16px Arial";
+    ctx.fillText("Score: " + score, 10, 20);
+
+    requestAnimationFrame(update);
+}
+
+update();
+
+
+  </script>
+</body>
+</html>
