@@ -192,7 +192,7 @@ height:300px;
   <h2>ろぬ「俺を倒してみぃ！」</h2>
   <p>ボタンを押してろぬを倒してみろ</p>
   <div class="canvas">
-  <canvas id="gameCanvas" width="780" height="320"></canvas>
+  <canvas id="gameCanvas" width="880" height="450"></canvas>
   <div class="button-container"> 
     <button class="button" id="shootButton">撃</button> 
     <button class="button" id="restartButton" style="display: none;">Re</button>
@@ -207,6 +207,11 @@ height:300px;
 
    const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
+// キャンバスの解像度を高く設定 
+canvas.width = 1 * canvas.clientWidth; canvas.height = 1 * canvas.clientHeight; ctx.scale(1, 1); 
+// スムーズなスケーリングを有効にする
+ ctx.imageSmoothingEnabled = true;
 const keys = {};
 let touchX = null;
 let gameOverFlag = false;
@@ -238,7 +243,7 @@ document.getElementById('leftButton').addEventListener('mouseup', () => keys['Ar
 document.getElementById('rightButton').addEventListener('mousedown', () => keys['ArrowRight'] = true); 
 document.getElementById('rightButton').addEventListener('mouseup', () => keys['ArrowRight'] = false);
 document.getElementById('leftButton').addEventListener('touchstart', () => keys['ArrowLeft'] = true); document.getElementById('leftButton').addEventListener('touchend', () => keys['ArrowLeft'] = false); document.getElementById('rightButton').addEventListener('touchstart', () => keys['ArrowRight'] = true); document.getElementById('rightButton').addEventListener('touchend', () => keys['ArrowRight'] = false);
-let player = { x: canvas.width / 2, y: canvas.height - 80, size: 80, speed: 4, bullets: [], ready: false };
+let player = { x: canvas.width / 2, y: canvas.height - 90, size: 90, speed: 4, bullets: [], ready: false };
 let enemies = [];
 let enemySpawnCounter = 0;
 let moveDirection = 1;
@@ -260,13 +265,19 @@ enemyImage.onload = function() {
     }
 };
 
+
+function drawPlayer() { 
+    if (player.ready) { ctx.drawImage(player.image, player.x, player.y, player.size * 2, player.size * 2); // サイズを2倍にして描画 } }
+    }
+}
 function drawEnemies() {
     for (const enemy of enemies) {
         if (enemy.ready) {
-            ctx.drawImage(enemy.image, enemy.x, enemy.y, enemy.size, enemy.size);
+            ctx.drawImage(enemy.image, enemy.x, enemy.y, enemy.size * 1.5, enemy.size * 1.5);
         }
     }
 }
+
 
 function drawBullets() {
     ctx.fillStyle = 'green';
