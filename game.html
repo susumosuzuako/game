@@ -243,7 +243,7 @@ document.getElementById('leftButton').addEventListener('mouseup', () => keys['Ar
 document.getElementById('rightButton').addEventListener('mousedown', () => keys['ArrowRight'] = true); 
 document.getElementById('rightButton').addEventListener('mouseup', () => keys['ArrowRight'] = false);
 document.getElementById('leftButton').addEventListener('touchstart', () => keys['ArrowLeft'] = true); document.getElementById('leftButton').addEventListener('touchend', () => keys['ArrowLeft'] = false); document.getElementById('rightButton').addEventListener('touchstart', () => keys['ArrowRight'] = true); document.getElementById('rightButton').addEventListener('touchend', () => keys['ArrowRight'] = false);
-let player = { x: canvas.width / 2, y: canvas.height - 90, size: 90, speed: 4, bullets: [], ready: false };
+let player = { x: canvas.width / 2, y: canvas.height - 80, size: 80, speed: 4, bullets: [], ready: false };
 let enemies = [];
 let enemySpawnCounter = 0;
 let moveDirection = 1;
