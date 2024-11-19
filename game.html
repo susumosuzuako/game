@@ -273,7 +273,7 @@ function drawPlayer() {
 function drawEnemies() {
     for (const enemy of enemies) {
         if (enemy.ready) {
-            ctx.drawImage(enemy.image, enemy.x, enemy.y, enemy.size * 1.5, enemy.size * 1.5);
+            ctx.drawImage(enemy.image, enemy.x, enemy.y, enemy.size * 1, enemy.size * 1);
         }
     }
 }
