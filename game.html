@@ -261,13 +261,13 @@ let enemyImage = new Image();
 enemyImage.src = "img/ronu.png";
 enemyImage.onload = function() {
     for (let i = 0; i < 5; i++) {
-        enemies.push({ x: Math.random() * (canvas.width - 40), y: Math.random() * (canvas.height / 2), size: 40, speed: 2, image: enemyImage, ready: true });
+        enemies.push({ x: Math.random() * (canvas.width - 40), y: Math.random() * (canvas.height / 2), size: 40, speed: 4, image: enemyImage, ready: true });
     }
 };
 
 
 function drawPlayer() { 
-    if (player.ready) { ctx.drawImage(player.image, player.x, player.y, player.size * 2, player.size * 2); // サイズを2倍にして描画 } }
+    if (player.ready) { ctx.drawImage(player.image, player.x, player.y, player.size * 1, player.size * 1); // サイズを2倍にして描画 } }
     }
 }
 function drawEnemies() {
@@ -295,7 +295,7 @@ function checkCollision(player, enemy) {
 
 function gameOver() {
     gameOverFlag = true;
-    alert("YOU LOSE！まだまだやな");
+    alert("YOU LOSE！まだまだやな\nさまとき「…ニゲ…ロ…」\nScore:"+ score);
     document.getElementById('restartButton').style.display = 'block';
 }
 
@@ -306,7 +306,7 @@ function restartGame() {
     enemies = [];
     score = 0;
     for (let i = 0; i < 5; i++) {
-        enemies.push({ x: Math.random() * (canvas.width - 40), y: Math.random() * (canvas.height / 2), size: 40, speed: 2, image: enemyImage, ready: true });
+        enemies.push({ x: Math.random() * (canvas.width - 40), y: Math.random() * (canvas.height / 2), size: 40, speed: 5, image: enemyImage, ready: true });
     }
     update();
 }
@@ -360,7 +360,7 @@ function update() {
 
     enemySpawnCounter++;
     if (enemySpawnCounter >= 60) {
-        enemies.push({ x: Math.random() * (canvas.width - 40), y: 0, size: 40, speed: 2, image: enemyImage, ready: true });
+        enemies.push({ x: Math.random() * (canvas.width - 40), y: 0, size: 40, speed: 3, image: enemyImage, ready: true });
         enemySpawnCounter = 0;
     }
 
@@ -375,6 +375,78 @@ function update() {
     ctx.fillStyle = "white";
     ctx.font = "16px Arial";
     ctx.fillText("Score: " + score, 10, 20);
+
+    requestAnimationFrame(update);
+}
+
+
+update();
+function checkWin() {
+    if (score >= 1500) { // スコアが100に達したら
+        gameOverFlag = true;
+        alert("YOU WIN！おまえの勝ちや…覚えてろよ\nScore:"+ score);
+        document.getElementById('restartButton').style.display = 'block';
+    }
+}
+
+function update() {
+    if (gameOverFlag) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawPlayer();
+    drawEnemies();
+    drawBullets();
+    if (keys['ArrowLeft']) {
+        player.x -= player.speed;
+    }
+    if (keys['ArrowRight']) {
+        player.x += player.speed;
+    }
+    if (touchX !== null) {
+        player.x = touchX - player.size / 2;
+    }
+    for (const bullet of player.bullets) {
+        bullet.y -= bullet.speed;
+    }
+    player.bullets = player.bullets.filter(bullet => bullet.y > 0);
+
+    player.bullets.forEach((bullet) => {
+        enemies.forEach((enemy) => {
+            if (
+                bullet.x < enemy.x + enemy.size &&
+                bullet.x + bullet.size > enemy.x &&
+                bullet.y < enemy.y + enemy.size &&
+                bullet.y + bullet.size > enemy.y
+            ) {
+                bullet.toRemove = true;
+                enemy.toRemove = true;
+                score += 10;
+            }
+        });
+    });
+
+    player.bullets = player.bullets.filter((bullet) => !bullet.toRemove);
+    enemies = enemies.filter((enemy) => !enemy.toRemove);
+
+    enemySpawnCounter++;
+    if (enemySpawnCounter >= 60) {
+        enemies.push({ x: Math.random() * (canvas.width - 40), y: 0, size: 40, speed: 4, image: enemyImage, ready: true });
+        enemySpawnCounter = 0;
+    }
+
+    for (const enemy of enemies) {
+        enemy.y += enemy.speed;
+        if (enemy.ready && checkCollision(player, enemy)) {
+            gameOver();
+            return;
+        }
+    }
+
+    ctx.fillStyle = "white";
+    ctx.font = "16px Arial";
+    ctx.fillText("Score: " + score, 10, 20);
+
+    checkWin(); // スコアをチェックして勝利条件を確認
 
     requestAnimationFrame(update);
 }
